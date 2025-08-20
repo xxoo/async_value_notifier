@@ -221,7 +221,7 @@ class _SyncStatusView extends StatelessWidget {
       children: [
         ValueListenableBuilder(
           valueListenable: ctrl.status,
-          builder: (_, TaskStatus s, __) => Chip(
+          builder: (_, s, __) => Chip(
             label: Text('status: ${_statusText(s)}'),
             backgroundColor: Colors.red.withValues(alpha: 0.1),
           ),
@@ -229,7 +229,7 @@ class _SyncStatusView extends StatelessWidget {
         const SizedBox(width: 8),
         ValueListenableBuilder(
           valueListenable: ctrl.errorCode,
-          builder: (_, int? e, __) => Chip(
+          builder: (_, e, __) => Chip(
             label: Text('error: ${e ?? '-'}'),
             backgroundColor: Colors.orange.withValues(alpha: 0.15),
           ),
@@ -249,17 +249,17 @@ class _AsyncStatusView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        AsyncValueListenableBuilder<TaskStatus>(
-          notifier: ctrl.status,
-          builder: (_, s) => Chip(
+        ValueListenableBuilder<TaskStatus>(
+          valueListenable: ctrl.status,
+          builder: (_, s, __) => Chip(
             label: Text('status: ${_statusText(s)}'),
             backgroundColor: Colors.green.withValues(alpha: 0.15),
           ),
         ),
         const SizedBox(width: 8),
-        AsyncValueListenableBuilder<int?>(
-          notifier: ctrl.errorCode,
-          builder: (_, e) => Chip(
+        ValueListenableBuilder<int?>(
+          valueListenable: ctrl.errorCode,
+          builder: (_, e, __) => Chip(
             label: Text('error: ${e ?? '-'}'),
             backgroundColor: Colors.blue.withValues(alpha: 0.15),
           ),
@@ -267,53 +267,6 @@ class _AsyncStatusView extends StatelessWidget {
       ],
     );
   }
-}
-
-/// Generic builder helper for AsyncValueNotifier
-class AsyncValueListenableBuilder<T> extends StatefulWidget {
-  final AsyncValueNotifier<T> notifier;
-  final Widget Function(BuildContext, T) builder;
-  const AsyncValueListenableBuilder({
-    super.key,
-    required this.notifier,
-    required this.builder,
-  });
-
-  @override
-  State<AsyncValueListenableBuilder<T>> createState() =>
-      _AsyncValueListenableBuilderState<T>();
-}
-
-class _AsyncValueListenableBuilderState<T>
-    extends State<AsyncValueListenableBuilder<T>> {
-  @override
-  void initState() {
-    super.initState();
-    widget.notifier.addListener(_listener);
-  }
-
-  @override
-  void didUpdateWidget(covariant AsyncValueListenableBuilder<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.notifier != widget.notifier) {
-      oldWidget.notifier.removeListener(_listener);
-      widget.notifier.addListener(_listener);
-    }
-  }
-
-  void _listener() {
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    widget.notifier.removeListener(_listener);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) =>
-      widget.builder(context, widget.notifier.value);
 }
 
 class _SectionTitle extends StatelessWidget {

@@ -15,7 +15,7 @@ class _AltListener {
 /// * Prevents common Flutter "setState()/markNeedsBuild during build" style exceptions by deferring callbacks until after the current stack unwinds.
 /// * Optionally suppresses "undo" changes (value changed then restored) and optionally ignores duplicate listener registrations.
 
-class AsyncValueNotifier<T> implements Listenable {
+class AsyncValueNotifier<T> implements ValueListenable<T> {
   final Iterable<VoidCallback> _listeners;
   final _altListeners = <_AltListener>[];
   var _pending = false;
@@ -56,9 +56,6 @@ class AsyncValueNotifier<T> implements Listenable {
 
   /// Whether the notifier has been disposed.
   bool get disposed => _disposed;
-
-  /// The current value stored in this notifier.
-  T get value => _value;
 
   /// Assigns a new value.
   ///
@@ -104,6 +101,9 @@ class AsyncValueNotifier<T> implements Listenable {
       _value = newValue;
     }
   }
+
+  @override
+  T get value => _value;
 
   @override
   void addListener(VoidCallback listener) => _setListener(listener, true);

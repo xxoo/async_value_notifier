@@ -1,3 +1,6 @@
+# 1.0.3
+- support ValueListenableBuilder
+
 # 1.0.2
 - fix broken link in README.md
 
