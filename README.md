@@ -19,4 +19,4 @@ import 'package:async_value_notifier/async_value_notifier.dart';
 ```
 
 ## Usage
-Almost the same as [`ValueNotifier`](https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html). For more information, please check [example](https://pub.dev/packages/async_value_notifier/example) or [API reference](https://pub.dev/documentation/async_value_notifier/latest/async_value_notifier/AsyncValueNotifier/asyncValueNotifier.html).
+Almost the same as [`ValueNotifier`](https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html). For more information, please check [example](https://pub.dev/packages/async_value_notifier/example) or [API reference](https://pub.dev/documentation/async_value_notifier/latest/async_value_notifier/AsyncValueNotifier-class.html).
