@@ -1,0 +1,17 @@
+name: example
+description: "example for async_value_notifier"
+publish_to: "none"
+environment:
+  sdk: ">=3.0.0"
+  flutter: ">=3.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  async_value_notifier:
+    path: ../
+
+dev_dependencies:
+  flutter_lints: any
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,22 @@
+name: async_value_notifier
+description: 'An asynchronous variant of ValueNotifier'
+version: 1.0.0
+repository: 'https://github.com/xxoo/async_value_notifier'
+issue_tracker: 'https://github.com/xxoo/async_value_notifier/issues'
+topics:
+  - async
+  - notifier
+  - batching
+  - tweak
+  - performance
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: any
