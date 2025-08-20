@@ -8,7 +8,7 @@ class _AltListener {
   const _AltListener(this.value, this.add);
 }
 
-/// An asynchronous variant of [ValueNotifier] that *coalesces* multiple value assignments performed within the same event‑loop turn into a single notification dispatched in a later microtask.
+/// An asynchronous variant of [ValueNotifier] that *coalesces* multiple value assignments within the same event‑loop turn into a single notification dispatched in a later microtask.
 ///
 /// Key benefits:
 /// * Avoids synchronous listener re‑entrancy corrupting sequential logic.

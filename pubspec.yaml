@@ -1,6 +1,6 @@
 name: async_value_notifier
-description: 'An asynchronous variant of ValueNotifier'
-version: 1.0.0
+description: 'An asynchronous variant of ValueNotifier that coalesces multiple value assignments within the same event‑loop turn into a single notification dispatched in a later microtask.'
+version: 1.0.1
 repository: 'https://github.com/xxoo/async_value_notifier'
 issue_tracker: 'https://github.com/xxoo/async_value_notifier/issues'
 topics:

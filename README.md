@@ -1,6 +1,6 @@
 ## About
 
-`AsyncValueNotifier` is an asynchronous variant of [`ValueNotifier`](https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html) that *coalesces* multiple value assignments performed within the same event‑loop turn into a single notification dispatched in a later microtask.
+`AsyncValueNotifier` is an asynchronous variant of [`ValueNotifier`](https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html) that *coalesces* multiple value assignments within the same event‑loop turn into a single notification dispatched in a later microtask.
 
 Key benefits:
 * Avoids synchronous listener re‑entrancy corrupting sequential logic.
