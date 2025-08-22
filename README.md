@@ -5,7 +5,8 @@
 Key benefits:
 * Avoids synchronous listener re‑entrancy corrupting sequential logic.
 * Prevents common Flutter "setState()/markNeedsBuild during build" style exceptions by deferring callbacks until after the current stack unwinds.
-* Optionally suppresses "undo" changes (value changed then restored) and optionally ignores duplicate listener registrations.
+* Optionally cancels notification if value reverted during the same event loop turn.
+* Optionally ignores duplicate listener registrations.
 
 ## Installation
 

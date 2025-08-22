@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 class _AltListener {
   final VoidCallback value;
   final bool add;
-
   const _AltListener(this.value, this.add);
 }
 
@@ -13,8 +12,8 @@ class _AltListener {
 /// Key benefits:
 /// * Avoids synchronous listener re‑entrancy corrupting sequential logic.
 /// * Prevents common Flutter "setState()/markNeedsBuild during build" style exceptions by deferring callbacks until after the current stack unwinds.
-/// * Optionally suppresses "undo" changes (value changed then restored) and optionally ignores duplicate listener registrations.
-
+/// * Optionally cancels notification if value reverted during the same event loop turn.
+/// * Optionally ignores duplicate listener registrations.
 class AsyncValueNotifier<T> implements ValueListenable<T> {
   final Iterable<VoidCallback> _listeners;
   final _altListeners = <_AltListener>[];
@@ -24,19 +23,19 @@ class AsyncValueNotifier<T> implements ValueListenable<T> {
   T _value;
 
   /// Whether the notifier should ignore unchanged notifications.
-  final bool undoable;
+  final bool cancelable;
 
   /// Whether the notifier supports ignoring duplicate listeners.
   final bool antiDuplication;
 
   /// Creates a new [AsyncValueNotifier] with the given [value].
   ///
-  /// [undoable] determines whether the notifier should suppress unchanged notifications.
+  /// [cancelable] determines whether the notifier should suppress unchanged notifications.
   ///
   /// [antiDuplication] determines whether the notifier should ignore duplicate listeners.
   AsyncValueNotifier(
     T value, {
-    this.undoable = false,
+    this.cancelable = false,
     this.antiDuplication = false,
   })  : _value = value,
         _listeners = antiDuplication ? <VoidCallback>{} : <VoidCallback>[];
@@ -61,7 +60,7 @@ class AsyncValueNotifier<T> implements ValueListenable<T> {
   ///
   /// Behavior:
   /// * The first *distinct* assignment in a turn schedules a microtask; later assignments in the same turn simply update [value] (only the final value is observed by listeners).
-  /// * On microtask execution we re‑check disposal and (if [undoable]) whether the value reverted; if reverted, we skip notifying.
+  /// * On microtask execution we re‑check disposal and (if [cancelable]) whether the value reverted; if reverted, we skip notifying.
   /// * [value] is updated *before* scheduling completes, so synchronous reads after the setter see the new value even though listeners have not run.
   set value(T newValue) {
     if (!_disposed && newValue != _value) {
@@ -71,7 +70,7 @@ class AsyncValueNotifier<T> implements ValueListenable<T> {
         // We intentionally use scheduleMicrotask instead of Future.microtask to avoid Future's additional error-handling semantics (which can wrap/deflect uncaught errors). Raw microtask preserves debugging clarity and still defers execution.
         scheduleMicrotask(() {
           _pending = false;
-          if (!_disposed && (!undoable || _value != oldValue)) {
+          if (!_disposed && (!cancelable || _value != oldValue)) {
             _dispatching = true;
             for (final listener in _listeners) {
               if (_disposed) {
