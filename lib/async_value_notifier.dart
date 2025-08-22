@@ -15,18 +15,22 @@ class _AltListener {
 /// * Optionally cancels notification if value reverted during the same event loop turn.
 /// * Optionally ignores duplicate listener registrations.
 class AsyncValueNotifier<T> implements ValueListenable<T> {
-  final Iterable<VoidCallback> _listeners;
+  /// Default comparison function for [AsyncValueNotifier].
+  static bool defaultIsEqual<T>(T a, T b) {
+    if (a == b) return true;
+    if (a is double && b is double) {
+      return a.compareTo(b) == 0;
+    }
+    return false;
+  }
+
+  bool _antiDuplication;
+  Iterable<VoidCallback> _listeners;
   final _altListeners = <_AltListener>[];
   var _pending = false;
   var _dispatching = false;
   var _disposed = false;
   T _value;
-
-  /// Whether the notifier should ignore unchanged notifications.
-  final bool cancelable;
-
-  /// Whether the notifier supports ignoring duplicate listeners.
-  final bool antiDuplication;
 
   /// Creates a new [AsyncValueNotifier] with the given [value].
   ///
@@ -35,9 +39,12 @@ class AsyncValueNotifier<T> implements ValueListenable<T> {
   /// [antiDuplication] determines whether the notifier should ignore duplicate listeners.
   AsyncValueNotifier(
     T value, {
+    bool Function(T, T)? isEqual,
+    antiDuplication = false,
     this.cancelable = false,
-    this.antiDuplication = false,
-  })  : _value = value,
+  })  : isEqual = isEqual ?? defaultIsEqual<T>,
+        _value = value,
+        _antiDuplication = antiDuplication,
         _listeners = antiDuplication ? <VoidCallback>{} : <VoidCallback>[];
 
   /// Disposes the notifier and (eagerly) clears listeners.
@@ -53,8 +60,33 @@ class AsyncValueNotifier<T> implements ValueListenable<T> {
     }
   }
 
+  /// The comparison function used to determine if two values are equal.
+  bool Function(T, T) isEqual;
+
+  /// Whether the notifier should ignore unchanged notifications.
+  bool cancelable;
+
+  /// Whether the notifier is currently pending notification.
+  bool get pending => _pending;
+
+  /// Whether the notifier is currently dispatching notifications.
+  bool get dispatching => _dispatching;
+
   /// Whether the notifier has been disposed.
   bool get disposed => _disposed;
+
+  /// Whether the notifier supports ignoring duplicate listeners.
+  bool get antiDuplication => _antiDuplication;
+
+  /// Sets whether the notifier should ignore duplicate listeners.
+  set antiDuplication(bool value) {
+    if (!_disposed && _antiDuplication != value) {
+      _antiDuplication = value;
+      if (!_dispatching) {
+        _changeAntiDuplication();
+      }
+    }
+  }
 
   /// Assigns a new value.
   ///
@@ -63,14 +95,14 @@ class AsyncValueNotifier<T> implements ValueListenable<T> {
   /// * On microtask execution we re‑check disposal and (if [cancelable]) whether the value reverted; if reverted, we skip notifying.
   /// * [value] is updated *before* scheduling completes, so synchronous reads after the setter see the new value even though listeners have not run.
   set value(T newValue) {
-    if (!_disposed && newValue != _value) {
+    if (!_disposed && !isEqual(_value, newValue)) {
       if (!_pending) {
         _pending = true;
         final oldValue = _value;
-        // We intentionally use scheduleMicrotask instead of Future.microtask to avoid Future's additional error-handling semantics (which can wrap/deflect uncaught errors). Raw microtask preserves debugging clarity and still defers execution.
+        // Future.microtask() is not suitable here cause it has own error handling logic.
         scheduleMicrotask(() {
           _pending = false;
-          if (!_disposed && (!cancelable || _value != oldValue)) {
+          if (!_disposed && (!cancelable || !isEqual(_value, oldValue))) {
             _dispatching = true;
             for (final listener in _listeners) {
               if (_disposed) {
@@ -87,6 +119,9 @@ class AsyncValueNotifier<T> implements ValueListenable<T> {
             if (_disposed) {
               _clearListeners();
             } else {
+              if (_listeners is Set<VoidCallback> != _antiDuplication) {
+                _changeAntiDuplication();
+              }
               for (final altListener in _altListeners) {
                 altListener.add
                     ? _addListener(altListener.value)
@@ -123,15 +158,18 @@ class AsyncValueNotifier<T> implements ValueListenable<T> {
     }
   }
 
-  void _clearListeners() => antiDuplication
+  void _changeAntiDuplication() =>
+      _listeners = _listeners is Set ? _listeners.toList() : _listeners.toSet();
+
+  void _clearListeners() => _listeners is Set<VoidCallback>
       ? (_listeners as Set<VoidCallback>).clear()
       : (_listeners as List<VoidCallback>).clear();
 
-  void _addListener(VoidCallback listener) => antiDuplication
+  void _addListener(VoidCallback listener) => _listeners is Set<VoidCallback>
       ? (_listeners as Set<VoidCallback>).add(listener)
       : (_listeners as List<VoidCallback>).add(listener);
 
-  void _removeListener(VoidCallback listener) => antiDuplication
+  void _removeListener(VoidCallback listener) => _listeners is Set<VoidCallback>
       ? (_listeners as Set<VoidCallback>).remove(listener)
       : (_listeners as List<VoidCallback>).remove(listener);
 }
