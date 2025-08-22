@@ -14,12 +14,14 @@ class _AltListener {
 /// * Prevents common Flutter "setState()/markNeedsBuild during build" style exceptions by deferring callbacks until after the current stack unwinds.
 /// * Optionally cancels notification if value reverted during the same event loop turn.
 /// * Optionally ignores duplicate listener registrations.
+/// * Supports custom equality checks.
 class AsyncValueNotifier<T> implements ValueListenable<T> {
   /// Default comparison function for [AsyncValueNotifier].
   static bool defaultIsEqual<T>(T a, T b) {
-    if (a == b) return true;
-    if (a is double && b is double) {
-      return a.compareTo(b) == 0;
+    if (a == b) {
+      return true;
+    } else if (a is double && b is double) {
+      return a.isNaN && b.isNaN;
     }
     return false;
   }

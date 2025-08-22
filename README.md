@@ -7,6 +7,7 @@ Key benefits:
 * Prevents common Flutter "setState()/markNeedsBuild during build" style exceptions by deferring callbacks until after the current stack unwinds.
 * Optionally cancels notification if value reverted during the same event loop turn.
 * Optionally ignores duplicate listener registrations.
+* Supports custom equality checks.
 
 ## Installation
 

@@ -1,3 +1,6 @@
+# 1.0.6
+- update README.md
+
 # 1.0.5
 - add `isEqual` param to allow custom equality checks
 - allow setting `isEqual`, `cancelable` and `antiDuplication` after creation
