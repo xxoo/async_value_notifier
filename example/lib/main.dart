@@ -69,7 +69,12 @@ class TaskControllerSync {
 /// Using AsyncValueNotifier: listener notifications are batched in a microtask.
 /// Sequential logic completes first; listeners run afterward, avoiding mid-flow interference.
 class TaskControllerAsync {
-  final status = AsyncValueNotifier(TaskStatus.ready);
+  final status = AsyncValueNotifier(
+    TaskStatus.ready,
+    weakListener: true,
+    cancelable: true,
+    distinct: true,
+  );
   final errorCode = AsyncValueNotifier<int?>(null);
 
   TaskControllerAsync() {

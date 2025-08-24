@@ -6,7 +6,8 @@ Key benefits:
 * Avoids synchronous listener re‑entrancy corrupting sequential logic.
 * Prevents common Flutter "setState()/markNeedsBuild during build" style exceptions by deferring callbacks until after the current stack unwinds.
 * Optionally cancels notification if value reverted during the same event loop turn.
-* Optionally ignores duplicate listener registrations.
+* Optionally ignores duplicate listeners while triggering.
+* Supports weak-referenced listeners (to avoid memory leaks).
 * Supports custom equality checks.
 
 ## Installation
@@ -21,4 +22,4 @@ import 'package:async_value_notifier/async_value_notifier.dart';
 ```
 
 ## Usage
-Almost the same as [`ValueNotifier`](https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html). For more information, please check [example](https://pub.dev/packages/async_value_notifier/example) or [API reference](https://pub.dev/documentation/async_value_notifier/latest/async_value_notifier/AsyncValueNotifier-class.html).
+Almost the same as [`ValueNotifier`](https://api.flutter.dev/flutter/foundation/ValueNotifier-class.html) while using the default configuration. For more information, please check [example](https://pub.dev/packages/async_value_notifier/example) or [API reference](https://pub.dev/documentation/async_value_notifier/latest/async_value_notifier/AsyncValueNotifier-class.html).

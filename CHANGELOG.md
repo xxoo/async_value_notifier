@@ -1,3 +1,7 @@
+# 1.1.0
+- **breaking change:** rename `antiDuplication` to `distinct`, and allow changing this behavior during `dispatching`
+- support weak references for listeners
+
 # 1.0.6
 - update README.md
 
